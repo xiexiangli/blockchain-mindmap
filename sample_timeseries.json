@@ -1,0 +1,19 @@
+{
+  "title": "Monthly Active Users Growth",
+  "x_label": "Month",
+  "y_label": "Users",
+  "series": [
+    {"time": "2025-01-01", "value": 1200},
+    {"time": "2025-02-01", "value": 1340},
+    {"time": "2025-03-01", "value": 1490},
+    {"time": "2025-04-01", "value": 1580},
+    {"time": "2025-05-01", "value": 1725},
+    {"time": "2025-06-01", "value": 1810},
+    {"time": "2025-07-01", "value": 1980},
+    {"time": "2025-08-01", "value": 2075},
+    {"time": "2025-09-01", "value": 2230},
+    {"time": "2025-10-01", "value": 2360},
+    {"time": "2025-11-01", "value": 2440},
+    {"time": "2025-12-01", "value": 2595}
+  ]
+}
