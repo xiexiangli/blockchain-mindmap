@@ -1,179 +1,97 @@
+# blockchain-mindmap 新人上手指南
 
-<!-- saved from url=(0056)file:///Users/mac/Downloads/blockchain_canvas%20(1).html -->
-<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>```html
+这是一个**用于讲解区块链中哈希链路关系**的极简可视化仓库。
 
+## 1. 仓库整体结构
 
+当前仓库只有两个核心文件：
 
-  
-  <title>哈希值在区块链中的作用示意图</title>
-  <style>
-    body {
-      margin: 0; padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #f0f4f8;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-    h2 {
-      margin: 1rem;
-    }
-    canvas {
-      border: 1px solid #ccc;
-      background: #fff;
-    }
-    button {
-      margin: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+- `README.md`：项目说明与新人学习路线（本文件）
+- `哈希值在区块链中的作用示意图.htm`：单页 HTML 演示文件，包含样式、画布绘制逻辑、交互逻辑
 
+> 说明：这两个文件当前内容高度相似。实际演示时建议直接打开 `.htm` 文件。
 
-  <h2>哈希值在区块链中的作用示意图</h2>
-  <canvas id="hashChain" width="900" height="380"></canvas>
-  <button id="tamperBtn">模拟篡改第2个区块数据</button>
+---
 
-  <script>
-    const canvas = document.getElementById("hashChain");
-    const ctx = canvas.getContext("2d");
+## 2. 演示程序在做什么
 
-    // 基本参数
-    const blockW = 180, blockH = 110;
-    const startX = 50, startY = 120;
-    const gap = 240;
+该示例用 Canvas 画出 3 个区块，并强调一个核心概念：
 
-    // 区块示意数据
-    let blocks = [
-      {index: 0, data: "交易数据A", hash: "AAA123", prevHash: "---", valid: true},
-      {index: 1, data: "交易数据B", hash: "BBB456", prevHash: "AAA123", valid: true},
-      {index: 2, data: "交易数据C", hash: "CCC789", prevHash: "BBB456", valid: true},
-    ];
+1. 区块数据会生成哈希值
+2. 下一个区块保存前一个区块的哈希（`prevHash`）
+3. 一旦中间区块被篡改，后续链路会失效
 
-    // 绘制单个区块
-    function drawBlock(block, x, y) {
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = block.valid ? "#4CAF50" : "#E53935";
-      ctx.fillStyle = block.valid ? "#A5D6A7" : "#EF9A9A";
-      ctx.fillRect(x, y, blockW, blockH);
-      ctx.strokeRect(x, y, blockW, blockH);
+交互按钮“模拟篡改第2个区块数据”会在两种数据之间切换，并触发重新计算与重绘。
 
-      ctx.fillStyle = "#000";
-      ctx.font = "bold 16px monospace";
-      ctx.fillText("区块 #" + block.index, x + 10, y + 25);
+---
 
-      ctx.font = "14px monospace";
-      ctx.fillText("数据: " + block.data, x + 10, y + 50);
-      ctx.fillText("哈希: " + block.hash, x + 10, y + 75);
-      ctx.fillText("前哈希: " + block.prevHash, x + 10, y + 100);
-    }
+## 3. 新人最需要先读懂的代码点
 
-    // 画箭头，表示链链接
-    function drawArrow(fromX, fromY, toX, toY, valid = true) {
-      const headLen = 12;
-      const dx = toX - fromX;
-      const dy = toY - fromY;
-      const angle = Math.atan2(dy, dx);
+按下面顺序阅读 `哈希值在区块链中的作用示意图.htm`：
 
-      ctx.strokeStyle = valid ? "#4CAF50" : "#E53935";
-      ctx.fillStyle = valid ? "#4CAF50" : "#E53935";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(fromX, fromY);
-      ctx.lineTo(toX, toY);
-      ctx.stroke();
+1. **数据模型 (`blocks`)**
+   - `index / data / hash / prevHash / valid` 分别表示区块编号、数据、当前哈希、前哈希、是否有效
+2. **渲染函数**
+   - `drawBlock`：画区块
+   - `drawArrow`：画区块间箭头
+   - `drawLabels`：画顶部解释文案
+3. **一致性计算**
+   - `fakeHash`：简化哈希函数（教学用途）
+   - `recalcHashes`：依据数据重算每个区块哈希并更新 `prevHash`
+   - `recalcValidity`：逐块校验“前哈希是否匹配上一块哈希”
+4. **主流程**
+   - 初始化：`recalcHashes -> recalcValidity -> draw`
+   - 交互：按钮点击后再次执行上述流程
 
-      ctx.beginPath();
-      ctx.moveTo(toX, toY);
-      ctx.lineTo(
-        toX - headLen * Math.cos(angle - Math.PI / 6),
-        toY - headLen * Math.sin(angle - Math.PI / 6)
-      );
-      ctx.lineTo(
-        toX - headLen * Math.cos(angle + Math.PI / 6),
-        toY - headLen * Math.sin(angle + Math.PI / 6)
-      );
-      ctx.lineTo(toX, toY);
-      ctx.fill();
-    }
+---
 
-    // 文字说明
-    function drawLabels() {
-      ctx.fillStyle = "#333";
-      ctx.font = "18px sans-serif";
-      ctx.fillText("1. 区块数据生成唯一哈希值", 20, 30);
-      ctx.fillText("2. 每个区块包含前一区块的哈希，形成链条", 20, 60);
-      ctx.fillText("3. 篡改区块数据会导致哈希变化，破坏链的完整性", 20, 90);
-    }
+## 4. 这个项目的边界（避免误解）
 
-    // 重新计算链条有效性
-    function recalcValidity() {
-      blocks.forEach((b, i) => {
-        if (i === 0) {
-          b.valid = true; // 第一个区块默认有效
-        } else {
-          // 校验前哈希是否和前区块哈希匹配
-          b.valid = b.prevHash === blocks[i - 1].hash && blocks[i - 1].valid;
-        }
-      });
-    }
+这是**教学可视化**，不是完整区块链实现。当前不包含：
 
-    // 模拟数据哈希更新（简化版，实际用复杂哈希函数）
-    function fakeHash(data) {
-      // 取字符串字符编码和长度构造简易伪哈希
-      let sum = 0;
-      for (let i = 0; i < data.length; i++) {
-        sum += data.charCodeAt(i);
-      }
-      return (data[0].toUpperCase() + sum.toString(16).toUpperCase()).slice(0,6);
-    }
+- 真实密码学哈希（如 SHA-256）
+- 工作量证明/权益证明
+- P2P 网络广播与共识
+- 交易池、数字签名、UTXO/账户模型
+- 持久化存储与节点同步
 
-    // 重新计算哈希和前哈希关联
-    function recalcHashes() {
-      blocks[0].hash = fakeHash(blocks[0].data);
-      for (let i = 1; i < blocks.length; i++) {
-        blocks[i].prevHash = blocks[i - 1].hash;
-        blocks[i].hash = fakeHash(blocks[i].data);
-      }
-    }
+因此它非常适合讲解“哈希链完整性”，但不适合直接作为生产区块链代码模板。
 
-    // 主绘制函数
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawLabels();
+---
 
-      for (let i = 0; i < blocks.length; i++) {
-        const x = startX + i * gap;
-        drawBlock(blocks[i], x, startY);
+## 5. 后续学习建议（循序渐进）
 
-        if (i > 0) {
-          drawArrow(
-            x,
-            startY + blockH / 2,
-            x - 30,
-            startY + blockH / 2,
-            blocks[i].valid
-          );
-        }
-      }
-    }
+### 阶段 A：先把示意图讲清楚
 
-    // 初始化画面
-    recalcHashes();
-    recalcValidity();
-    draw();
+- 能口头解释 `hash` 与 `prevHash` 的关系
+- 能解释为什么“改动区块 2 会影响区块 3 的有效性”
+- 能修改 `blocks` 数量并保持渲染正确
 
-    // 模拟篡改数据按钮事件
-    document.getElementById("tamperBtn").addEventListener("click", () => {
-      blocks[1].data = blocks[1].data === "交易数据B" ? "篡改的数据！" : "交易数据B";
-      recalcHashes();
-      recalcValidity();
-      draw();
-    });
-  </script>
+### 阶段 B：增强教学可信度
 
+- 用 Web Crypto API 的 `SHA-256` 替代 `fakeHash`
+- 给每个区块新增 `nonce` 字段，演示“挖矿”概念（找前导零）
+- 增加“自动重算后续区块”的开关，对比篡改前后
 
-```
+### 阶段 C：走向工程化
 
-</body></html>
+- 拆分成 `HTML + CSS + JS` 多文件结构
+- 给计算逻辑添加单元测试（如 Vitest/Jest）
+- 加上最小化构建工具（Vite）和 lint（ESLint）
+
+### 阶段 D：理解真实区块链系统
+
+- 学习 Merkle Tree 与区块头结构
+- 学习签名机制（ECDSA/EdDSA）
+- 学习共识协议、分叉处理、最终性
+
+---
+
+## 6. 建议给新人的第一个练习
+
+1. 把区块数从 3 个改成 5 个
+2. 给每个区块加入时间戳字段并渲染
+3. 增加“篡改任意区块”的输入框
+4. 观察并解释哪些区块会变红（`valid=false`）
+
+完成这 4 步后，新人对“链式哈希完整性”的理解通常会非常扎实。
