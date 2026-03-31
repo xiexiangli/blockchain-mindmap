@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>光合作用科普视频</title>
+  <style>
+    :root {
+      --bg1: #031b33;
+      --bg2: #114b5f;
+      --text: #f4f9ff;
+      --accent: #ffd166;
+      --green: #57cc99;
+      --red: #ef476f;
+      --blue: #4cc9f0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 20% 20%, #143d5a, #031b33 60%);
+      color: var(--text);
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .player {
+      width: min(960px, 92vw);
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      background: linear-gradient(120deg, var(--bg1), var(--bg2));
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      padding: 64px 72px;
+      opacity: 0;
+      transform: scale(1.03);
+      transition: opacity .8s ease, transform .8s ease;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    .scene.active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    h1, h2 { margin: 0; line-height: 1.2; }
+    h1 { font-size: clamp(2rem, 4vw, 3rem); color: var(--accent); }
+    h2 { font-size: clamp(1.45rem, 2.6vw, 2.2rem); }
+
+    p {
+      margin: 0;
+      font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+      line-height: 1.7;
+      max-width: 70ch;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: .92rem;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.3);
+      width: fit-content;
+    }
+
+    .diagram {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: clamp(1rem, 1.4vw, 1.2rem);
+    }
+
+    .chip {
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.24);
+    }
+
+    .chip.sun { background: rgba(255,209,102,.2); border-color: rgba(255,209,102,.6); }
+    .chip.leaf { background: rgba(87,204,153,.2); border-color: rgba(87,204,153,.6); }
+    .chip.in { background: rgba(76,201,240,.2); border-color: rgba(76,201,240,.6); }
+    .chip.out { background: rgba(239,71,111,.2); border-color: rgba(239,71,111,.6); }
+
+    .arrow { font-size: 1.5rem; opacity: .8; }
+
+    .subtitle {
+      font-size: clamp(1rem, 1.45vw, 1.2rem);
+      opacity: .95;
+      padding: 12px 16px;
+      background: rgba(0,0,0,.22);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+    }
+
+    .hud {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      font-size: 0.92rem;
+      opacity: .9;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 5;
+    }
+
+    .dot {
+      width: 10px;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      background: #ff4d6d;
+      animation: pulse 1.3s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      70% { transform: scale(1.4); opacity: .35; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .progress {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      width: 0;
+      z-index: 6;
+    }
+  </style>
+</head>
+<body>
+  <div class="player" id="player">
+    <div class="hud"><span class="dot"></span>科普视频自动播放中</div>
+    <div class="progress" id="progress"></div>
+
+    <section class="scene active">
+      <span class="tag">第 1 幕｜开场</span>
+      <h1>光合作用：地球能量循环的“绿色引擎”</h1>
+      <p>我们每天呼吸的氧气、吃的粮食和水果，都和植物的光合作用有关。今天用 1 分钟，带你看懂这个“把阳光变成食物”的魔法过程。</p>
+      <div class="subtitle">旁白：光合作用是植物、藻类和部分细菌利用光能合成有机物，并释放氧气的过程。</div>
+    </section>
+
+    <section class="scene">
+      <span class="tag">第 2 幕｜原料</span>
+      <h2>光合作用需要哪些“材料”？</h2>
+      <div class="diagram">
+        <span class="chip sun">☀️ 阳光</span><span class="arrow">+</span>
+        <span class="chip in">💧 水（根吸收）</span><span class="arrow">+</span>
+        <span class="chip in">🌫️ 二氧化碳（叶片气孔吸收）</span>
+      </div>
+      <p>叶绿体中的叶绿素像“太阳能电池板”，负责捕获光能。没有光，植物也很难高效制造养分。</p>
+      <div class="subtitle">旁白：阳光提供能量，水和二氧化碳提供构建有机物的原料。</div>
+    </section>
+
+    <section class="scene">
+      <span class="tag">第 3 幕｜反应</span>
+      <h2>在叶绿体里发生了什么？</h2>
+      <div class="diagram">
+        <span class="chip in">6CO₂</span>
+        <span class="chip in">6H₂O</span>
+        <span class="chip sun">光能</span>
+        <span class="arrow">→</span>
+        <span class="chip out">C₆H₁₂O₆</span>
+        <span class="chip out">6O₂</span>
+      </div>
+      <p>简化后的总反应式是：6CO₂ + 6H₂O 在光照和叶绿素条件下，生成葡萄糖和氧气。葡萄糖会被运输、储存或继续代谢。</p>
+      <div class="subtitle">旁白：植物把“无机物”变成“有机物”，这一步对生态系统至关重要。</div>
+    </section>
+
+    <section class="scene">
+      <span class="tag">第 4 幕｜意义</span>
+      <h2>为什么说光合作用改变了地球？</h2>
+      <p>它一方面固定了大气中的二氧化碳，另一方面不断释放氧气，塑造了适合多数生物生存的大气环境。食物链中的能量，也大多来自这一步“初始充能”。</p>
+      <div class="subtitle">旁白：没有光合作用，就没有稳定的氧气来源，也很难有今天丰富的生命形态。</div>
+    </section>
+
+    <section class="scene">
+      <span class="tag">第 5 幕｜生活联系</span>
+      <h2>我们能做什么？</h2>
+      <p>多种树、保护森林、减少浪费、支持生态农业，都是在守护光合作用这台“地球空气净化器”和“天然能量工厂”。</p>
+      <div class="subtitle">旁白：保护绿色植物，就是在保护我们自己的未来。</div>
+    </section>
+
+    <section class="scene">
+      <span class="tag">第 6 幕｜结尾</span>
+      <h2>一分钟总结</h2>
+      <p>光合作用 = 阳光 + 水 + 二氧化碳 → 葡萄糖 + 氧气。它让能量进入食物网，也让地球更适合呼吸。下次看到一片叶子，别忘了它正在“制造生命”。</p>
+      <div class="subtitle">旁白：关注科学，理解自然。谢谢观看！</div>
+    </section>
+  </div>
+
+  <script>
+    const scenes = [...document.querySelectorAll('.scene')];
+    const progress = document.getElementById('progress');
+    const sceneDuration = 10000;
+    const totalDuration = sceneDuration * scenes.length;
+    let index = 0;
+    let start = performance.now();
+
+    function showScene(i) {
+      scenes.forEach((scene, idx) => scene.classList.toggle('active', idx === i));
+    }
+
+    function tick(ts) {
+      const elapsed = ts - start;
+      const p = Math.min(100, (elapsed / totalDuration) * 100);
+      progress.style.width = p + '%';
+
+      const nextIndex = Math.min(scenes.length - 1, Math.floor(elapsed / sceneDuration));
+      if (nextIndex !== index) {
+        index = nextIndex;
+        showScene(index);
+      }
+
+      if (elapsed < totalDuration) {
+        requestAnimationFrame(tick);
+      }
+    }
+
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
